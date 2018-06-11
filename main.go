@@ -22,7 +22,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(&hostname, "hostname", "127.0.0.1", "The hostname or IP on which the REST server will listen")
+	flag.StringVar(&hostname, "hostname", "0.0.0.0", "The hostname or IP on which the REST server will listen")
 	flag.IntVar(&port, "port", 80, "The port on which the REST server will listen")
 	flag.StringVar(&path, "path", "dist/", "Http Document Path")
 	router = mux.NewRouter().StrictSlash(true)
@@ -35,9 +35,17 @@ func main() {
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.MkdirAll(path, os.ModePerm)
+		// indexfile := path + "index.html"
+		// if _, err := os.Stat(indexfile); os.IsNotExist(err) {
+		// 	var file, _ = os.Create(indexfile)
+		// 	file.WriteString("Hello World!")
+		// 	file.Sync()
+		// }
 	}
 
 	handlers()
+
+	router.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir(path))))
 
 	var address = fmt.Sprintf("%s:%d", hostname, port)
 
