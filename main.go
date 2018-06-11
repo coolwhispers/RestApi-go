@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -22,7 +23,7 @@ var (
 
 func init() {
 	flag.StringVar(&hostname, "hostname", "127.0.0.1", "The hostname or IP on which the REST server will listen")
-	flag.IntVar(&port, "port", 8080, "The port on which the REST server will listen")
+	flag.IntVar(&port, "port", 80, "The port on which the REST server will listen")
 	flag.StringVar(&path, "path", "dist/", "Http Document Path")
 	router = mux.NewRouter().StrictSlash(true)
 }
@@ -31,12 +32,13 @@ func main() {
 	stopChan := make(chan os.Signal)
 	signal.Notify(stopChan, os.Interrupt)
 	flag.Parse()
-
+	var address = fmt.Sprintf("%s:%d", hostname, port)
 	handlers()
 
-	srv := &http.Server{Addr: ":80", Handler: router}
+	srv := &http.Server{Addr: address, Handler: router}
 	go func() {
 		// service connections
+		log.Printf("Server Start on http://%s:%d", hostname, port)
 		if err := srv.ListenAndServe(); err != nil {
 			log.Printf("listen: %s\n", err)
 		}
