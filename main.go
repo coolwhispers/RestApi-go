@@ -32,11 +32,14 @@ func main() {
 	stopChan := make(chan os.Signal)
 	signal.Notify(stopChan, os.Interrupt)
 	flag.Parse()
-	var address = fmt.Sprintf("%s:%d", hostname, port)
-	handlers()
+
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.MkdirAll(path, os.ModePerm)
 	}
+
+	handlers()
+
+	var address = fmt.Sprintf("%s:%d", hostname, port)
 
 	srv := &http.Server{Addr: address, Handler: router}
 	go func() {
