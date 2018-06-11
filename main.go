@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -12,6 +13,18 @@ import (
 
 	"github.com/gorilla/mux"
 )
+
+func handlers() {
+	routerPath("/api", httpGet, func(w http.ResponseWriter, r *http.Request) {
+		log.Print("in")
+		// composite response body
+		var res = map[string]string{"result": "succ", "name": "test"}
+		response, _ := json.Marshal(res)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(response)
+	})
+
+}
 
 var (
 	router   *mux.Router
@@ -32,16 +45,6 @@ func main() {
 	stopChan := make(chan os.Signal)
 	signal.Notify(stopChan, os.Interrupt)
 	flag.Parse()
-
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		os.MkdirAll(path, os.ModePerm)
-		// indexfile := path + "index.html"
-		// if _, err := os.Stat(indexfile); os.IsNotExist(err) {
-		// 	var file, _ = os.Create(indexfile)
-		// 	file.WriteString("Hello World!")
-		// 	file.Sync()
-		// }
-	}
 
 	handlers()
 
