@@ -5,6 +5,7 @@ RUN go get github.com/golang/dep/cmd/dep
 
 WORKDIR /go/src/app
 COPY ./ ./
+
 RUN dep ensure -vendor-only
 
 RUN go build -o ./output/app
