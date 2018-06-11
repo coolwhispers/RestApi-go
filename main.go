@@ -34,6 +34,9 @@ func main() {
 	flag.Parse()
 	var address = fmt.Sprintf("%s:%d", hostname, port)
 	handlers()
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		os.MkdirAll(path, os.ModePerm)
+	}
 
 	srv := &http.Server{Addr: address, Handler: router}
 	go func() {
